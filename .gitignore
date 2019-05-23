@@ -102,3 +102,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# comment the below line when freezing the the packages
+Pipfile.lock
