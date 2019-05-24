@@ -13,8 +13,20 @@ gmap=GoogleMap()
 weather=commuteWeather()
 weather_locs=dict()
 
+holidays=list()
+
+def loadholidays(yr):
+    with open(f'data/holidays_{yr}.text', 'r') as f:
+        for l in f.readlines():
+            holidays.append(l.strip())
+
+def is_holiday(dt):
+    dt_str=datetime.strftime(dt, '%Y-%m-%dd')
+    return dt_str in holidays
+
 
 def partofday(hr):
+
     if hr < 6 :
         return 'early_morning'
     elif 6 <= hr < 12:
@@ -32,6 +44,13 @@ def saveCommute():
     dt=datetime.now(tz)
     weekday=dt.weekday()
     daypart=partofday(dt.hour)
+
+    yr=str(dt.year)
+    loadholidays(yr)
+
+    holiday=0
+    if is_holiday(dt) or weekday in [5,6]:
+        holiday=1
 
     # arrival time of the transit at origin
     arrival_time=int(dt.replace(tzinfo=timezone.utc).timestamp())
@@ -81,7 +100,7 @@ def saveCommute():
                     # get the route weather details
                     weather_details=getrouteWeatherDetails(orig_dest_id)
 
-                    line=f'{orig_dest_id},{weekday},{daypart},{line},{weather_details}'
+                    line=f'{orig_dest_id},{weekday},{holiday},{daypart},{line},{weather_details}'
                     #print(line)
                     f.write(line+"\n")
 
